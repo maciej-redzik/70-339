@@ -1,7 +1,10 @@
 Add-PSSnapin Microsoft.SharePoint.PowerShell
 
 #register new managed user 'sp2016_service' for service applications
-$strPass = Read-Host -AsSecureString ''
+if($strPass -eq $null) {
+    Write-Host "Type password for service account:"
+    $strPass = Read-Host -AsSecureString
+}
 $serviceAccountCredentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "DEV\SP2016_Service", $strPass
 $serviceAppUser = New-SPManagedAccount -Credential $serviceAccountCredentials
 
@@ -18,3 +21,6 @@ $secStoreAppProxy = New-SPSecureStoreServiceApplicationProxy -ServiceApplication
 $secStoreApp = Get-SPServiceApplication | Where-Object { $_.DisplayName -eq "Secure Store Service Application" }
 $secStoreApp.Provision()
 iisreset.exe
+
+#After setting up Master-key and creating target applications -> don'f forget to set up Administrators for this service application!
+# Central Adm. -> Application Management -> Manage Service Applications -> 'select' Secure Store Service Application -> Administrators (on the ribbon)
